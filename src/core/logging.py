@@ -1,11 +1,14 @@
-import structlog
 import logging
 import sys
+
+import structlog
+
 from src.config import settings
+
 
 def configure_logging():
     """Configure structured logging"""
-    
+
     shared_processors = [
         structlog.contextvars.merge_contextvars,
         structlog.processors.add_log_level,
@@ -20,7 +23,9 @@ def configure_logging():
 
     structlog.configure(
         processors=shared_processors + [formatter],
-        wrapper_class=structlog.make_filtering_bound_logger(logging.getLevelName(settings.LOG_LEVEL)),
+        wrapper_class=structlog.make_filtering_bound_logger(
+            logging.getLevelName(settings.LOG_LEVEL)
+        ),
         context_class=dict,
         logger_factory=structlog.PrintLoggerFactory(),
         cache_logger_on_first_use=True,
@@ -32,5 +37,6 @@ def configure_logging():
         stream=sys.stdout,
         level=getattr(logging, settings.LOG_LEVEL),
     )
+
 
 logger = structlog.get_logger()

@@ -1,12 +1,13 @@
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.pool import NullPool, QueuePool
+from typing import AsyncGenerator
+
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.pool import NullPool, Pool, QueuePool
+
 from src.config import settings
-from src.core.base import Base
-import aiomysql
 
 # Connection pooling untuk production
 if settings.DEBUG:
-    pool_class = NullPool
+    pool_class: type[Pool] = NullPool
     pool_args = {}
 else:
     pool_class = QueuePool
@@ -30,10 +31,11 @@ AsyncSessionLocal = async_sessionmaker(
     class_=AsyncSession,
     expire_on_commit=False,
     autocommit=False,
-    autoflush=False
+    autoflush=False,
 )
 
-async def get_db() -> AsyncSession:
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """Dependency injection untuk database session dengan proper transaction handling"""
     async with AsyncSessionLocal() as session:
         try:

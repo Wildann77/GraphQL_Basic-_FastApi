@@ -1,4 +1,4 @@
-.PHONY: install dev-install up down test lint format migrate shell
+.PHONY: install dev-install up down watch test lint format migrate shell
 
 install:
 	pip install -r requirements.txt
@@ -8,13 +8,16 @@ dev-install:
 	pre-commit install
 
 up:
-	docker-compose up --build -d
+	docker compose up --build -d
+
+watch:
+	docker compose up --watch
 
 down:
-	docker-compose down -v
+	docker compose down -v
 
 logs:
-	docker-compose logs -f api
+	docker compose logs -f api
 
 test:
 	pytest tests/ -v --tb=short
@@ -31,13 +34,13 @@ format:
 	ruff check src --fix
 
 migrate:
-	docker-compose exec api alembic revision --autogenerate -m "$(m)"
+	docker compose exec api alembic revision --autogenerate -m "$(m)"
 
 migrate-up:
-	docker-compose exec api alembic upgrade head
+	docker compose exec api alembic upgrade head
 
 migrate-down:
-	docker-compose exec api alembic downgrade -1
+	docker compose exec api alembic downgrade -1
 
 shell:
-	docker-compose exec api bash
+	docker compose exec api bash
