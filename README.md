@@ -9,11 +9,10 @@ This is a modern, high-performance GraphQL API built with **FastAPI** and **Stra
 - **Dockerized**: specific `Dockerfile` with multi-stage builds (Builder, Base, Development, Production) and `docker-compose` setup.
 - **Hot Reload**: Supports `docker compose watch` for seamless development.
 - **Rate Limiting**: Integrated Redis-based rate limiting using [SlowAPI](https://github.com/laurentS/slowapi).
-- **Security**: JWT Authentication and password hashing.
 - **Migrations**: Database schema management with [Alembic](https://alembic.sqlalchemy.org/).
 - **Monitoring**: Prometheus metrics integration.
 - **Structured Logging**: JSON logging using `structlog`.
-- **Code Quality**: Pre-configured using `ruff`, `black`, and `mypy`.
+
 
 ## 🛠 Tech Stack
 
