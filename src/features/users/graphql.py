@@ -20,6 +20,7 @@ from src.features.users.service import UserService
 class UserQuery:
     @strawberry.field
     async def users(self, info: Info, skip: int = 0, limit: int = 100) -> UsersResponse:
+        logger.info("query_users", skip=skip, limit=limit)
         try:
             session = info.context["session"]
             service = UserService(session)
@@ -31,6 +32,7 @@ class UserQuery:
 
     @strawberry.field
     async def user(self, info: Info, id: int) -> UserResponse:
+        logger.info("query_user", user_id=id)
         try:
             # Menggunakan DataLoader untuk mendukung concurrency/batch query
             loaders = info.context["loaders"]
