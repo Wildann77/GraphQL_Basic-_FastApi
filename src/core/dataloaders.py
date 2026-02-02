@@ -17,16 +17,19 @@ class UserLoader(BaseLoader):
     """Batch load users untuk hindari N+1 problem"""
 
     async def load_users(self, keys: List[int]) -> List[Optional["User"]]:
-        from src.features.users.models import UserModel
+        from src.core.logging import logger
+        from src.features.users.repository import UserRepository
         from src.features.users.schemas import User
 
-        result = await self.session.execute(
-            select(UserModel).where(UserModel.id.in_(keys))
+        logger.debug(
+            "dataloader_batch_processing", loader="UserLoader", batch_size=len(keys)
         )
 
-        users_map = {}
-        for user in result.scalars().all():
-            users_map[user.id] = User(
+        repo = UserRepository(self.session)
+        users_map = await repo.get_by_ids(keys)
+
+        return [
+            User(
                 id=user.id,  # type: ignore
                 name=user.name,  # type: ignore
                 email=user.email,  # type: ignore
@@ -34,8 +37,10 @@ class UserLoader(BaseLoader):
                 created_at=user.created_at,
                 updated_at=user.updated_at,
             )
-
-        return [users_map.get(key) for key in keys]
+            if (user := users_map.get(key))
+            else None
+            for key in keys
+        ]
 
     def get_loader(self) -> DataLoader:
         return DataLoader(load_fn=self.load_users)
