@@ -16,6 +16,9 @@ watch:
 down:
 	docker compose down -v
 
+down-no-v:
+	docker compose down
+
 logs:
 	docker compose logs -f api
 
