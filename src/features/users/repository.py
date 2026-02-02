@@ -19,7 +19,10 @@ class UserRepository:
             query = query.where(UserModel.is_deleted.is_(False))
 
         result = await self.session.execute(query)
-        return result.scalar_one_or_none()
+        user = result.scalar_one_or_none()
+        if user:
+            logger.debug("user_fetched_by_id", user_id=user_id)
+        return user
 
     async def get_by_ids(self, user_ids: List[int]) -> dict[int, UserModel]:
         """Batch fetch untuk DataLoader"""
@@ -31,7 +34,9 @@ class UserRepository:
             .where(UserModel.id.in_(user_ids))
             .where(UserModel.is_deleted.is_(False))
         )
-        return {user.id: user for user in result.scalars().all() if user.id is not None}
+        users = {user.id: user for user in result.scalars().all() if user.id is not None}
+        logger.debug("users_batch_fetched", count=len(users), requested_ids=len(user_ids))
+        return users
 
     async def get_by_email(self, email: str) -> Optional[UserModel]:
         result = await self.session.execute(
@@ -39,7 +44,10 @@ class UserRepository:
             .where(UserModel.email == email)
             .where(UserModel.is_deleted.is_(False))
         )
-        return result.scalar_one_or_none()
+        user = result.scalar_one_or_none()
+        if user:
+            logger.debug("user_fetched_by_email", email=email)
+        return user
 
     async def get_all(self, skip: int = 0, limit: int = 100) -> List[UserModel]:
         result = await self.session.execute(
@@ -49,7 +57,9 @@ class UserRepository:
             .limit(limit)
             .order_by(UserModel.created_at.desc())
         )
-        return list(result.scalars().all())
+        users = list(result.scalars().all())
+        logger.debug("users_all_fetched", count=len(users), skip=skip, limit=limit)
+        return users
 
     async def create(self, name: str, email: str) -> UserModel:
         existing = await self.get_by_email(email)
@@ -102,4 +112,5 @@ class UserRepository:
 
         await self.session.delete(user)
         await self.session.flush()
+        logger.info("user_hard_deleted", user_id=user_id)
         return True
