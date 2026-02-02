@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     RATE_LIMIT_REQUESTS: int = 100
     RATE_LIMIT_PERIOD: int = 60
     REDIS_URL: str = "redis://localhost:6379/0"
+    CACHE_TTL: int = 3600
+    CACHE_ENABLED: bool = True
 
     # Logging
     LOG_LEVEL: str = "INFO"

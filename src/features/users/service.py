@@ -3,6 +3,7 @@ from typing import List, Optional
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.core.cache import CacheService
 from src.core.exceptions import ValidationError
 from src.core.logging import logger
 from src.features.users.models import UserModel
@@ -20,9 +21,10 @@ class UserService:
     def __init__(self, session: AsyncSession):
         self.session = session
         self.repository = UserRepository(session)
+        self.cache = CacheService()
 
     def _to_schema(self, model: UserModel) -> UserSchema:
-        assert model.id is not None
+        assert model.id is not Non kamu punya standar penulisan kode atau le
         assert model.name is not None
         assert model.email is not None
         assert model.is_active is not None
@@ -36,17 +38,34 @@ class UserService:
         )
 
     async def list_users(self, skip: int = 0, limit: int = 100) -> List[UserSchema]:
+        cache_key = f"users:list:{skip}:{limit}"
+        cached = await self.cache.get(cache_key, List[UserSchema])
+        if cached:
+            return cached
+
         users = await self.repository.get_all(skip=skip, limit=limit)
-        return [self._to_schema(u) for u in users]
+        results = [self._to_schema(u) for u in users]
+        await self.cache.set(cache_key, results, ttl=60)
+        return results
 
     async def get_user(self, user_id: int) -> Optional[UserSchema]:
+        cache_key = f"user:{user_id}"
+        cached = await self.cache.get(cache_key, UserSchema)
+        if cached:
+            return cached
+
         user = await self.repository.get_by_id(user_id)
-        return self._to_schema(user) if user else None
+        if user:
+            result = self._to_schema(user)
+            await self.cache.set(cache_key, result)
+            return result
+        return None
 
     async def create_user(self, data: CreateUserInputValidation) -> UserSchema:
         try:
             user = await self.repository.create(data.name, str(data.email))
             await self.session.commit()
+            await self.cache.delete_pattern("users:list:*")
             return self._to_schema(user)
         except ValueError as e:
             await self.session.rollback()
@@ -67,6 +86,8 @@ class UserService:
                 return None
 
             await self.session.commit()
+            await self.cache.delete(f"user:{user_id}")
+            await self.cache.delete_pattern("users:list:*")
             return self._to_schema(user)
         except ValueError as e:
             await self.session.rollback()
@@ -76,4 +97,6 @@ class UserService:
         result = await self.repository.soft_delete(user_id)
         if result:
             await self.session.commit()
+            await self.cache.delete(f"user:{user_id}")
+            await self.cache.delete_pattern("users:list:*")
         return result
