@@ -21,9 +21,6 @@ class UserLoader(BaseLoader):
         from src.features.users.repository import UserRepository
         from src.features.users.schemas import User
 
-        logger.debug(
-            "dataloader_batch_processing", loader="UserLoader", batch_size=len(keys)
-        )
 
         repo = UserRepository(self.session)
         users_map = await repo.get_by_ids(keys)
