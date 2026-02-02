@@ -11,7 +11,7 @@ This is a modern, high-performance GraphQL API built with **FastAPI** and **Stra
 - **Rate Limiting**: Integrated Redis-based rate limiting using [SlowAPI](https://github.com/laurentS/slowapi).
 - **Migrations**: Database schema management with [Alembic](https://alembic.sqlalchemy.org/).
 - **Monitoring**: Prometheus metrics integration.
-- **Structured Logging**: JSON logging using `structlog`.
+- **Structured Logging**: JSON logging using `structlog`..
 
 
 ## 🛠 Tech Stack
