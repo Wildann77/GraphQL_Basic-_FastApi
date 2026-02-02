@@ -4,8 +4,6 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from strawberry.dataloader import DataLoader
 
-from src.core.logging import logger
-
 if TYPE_CHECKING:
     from src.features.users.schemas import User
 
@@ -21,8 +19,6 @@ class UserLoader(BaseLoader):
     async def load_users(self, keys: List[int]) -> List[Optional["User"]]:
         from src.features.users.models import UserModel
         from src.features.users.schemas import User
-
-        logger.info("dataloader_load_users", keys=keys)
 
         result = await self.session.execute(
             select(UserModel).where(UserModel.id.in_(keys))

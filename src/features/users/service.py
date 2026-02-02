@@ -36,12 +36,10 @@ class UserService:
         )
 
     async def list_users(self, skip: int = 0, limit: int = 100) -> List[UserSchema]:
-        logger.info("fetch_users", skip=skip, limit=limit)
         users = await self.repository.get_all(skip=skip, limit=limit)
         return [self._to_schema(u) for u in users]
 
     async def get_user(self, user_id: int) -> Optional[UserSchema]:
-        logger.info("fetch_user", user_id=user_id)
         user = await self.repository.get_by_id(user_id)
         return self._to_schema(user) if user else None
 
