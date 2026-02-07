@@ -24,7 +24,7 @@ class UserService:
         self.cache = CacheService()
 
     def _to_schema(self, model: UserModel) -> UserSchema:
-        assert model.id is not Non kamu punya standar penulisan kode atau le
+        assert model.id is not None
         assert model.name is not None
         assert model.email is not None
         assert model.is_active is not None
