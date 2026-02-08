@@ -5,11 +5,12 @@ This is a modern, high-performance GraphQL API built with **FastAPI** and **Stra
 ## 🚀 Features
 
 - **GraphQL API**: Built with [Strawberry](https://strawberry.rocks/) and [FastAPI](https://fastapi.tiangolo.com/).
+- **Reverse Proxy**: [Nginx](https://www.nginx.com/) integrated as the main entry point for security and performance.
 - **Asynchronous Database**: High-performance async MySQL access using [SQLAlchemy 2.0](https://www.sqlalchemy.org/) and `aiomysql`.
 - **DataLoaders**: Efficient batching of database queries using Strawberry DataLoaders to solve the N+1 problem.
 - **Advanced Caching**: Redis-integrated caching layer with Pydantic serialization for high-performance response times.
-- **Dockerized**: specific `Dockerfile` with multi-stage builds (Builder, Base, Development, Production) and `docker-compose` setup.
-- **Hot Reload**: Supports `docker compose watch` for seamless development.
+- **Dockerized**: specific `Dockerfile` with multi-stage builds and `docker-compose` setup.
+- **Hot Reload**: Supports `docker compose watch` for both API and Nginx configurations.
 - **Rate Limiting**: Integrated Redis-based rate limiting using [SlowAPI](https://github.com/laurentS/slowapi).
 - **Migrations**: Database schema management with [Alembic](https://alembic.sqlalchemy.org/).
 - **Monitoring**: Prometheus metrics integration.
@@ -27,6 +28,7 @@ This is a modern, high-performance GraphQL API built with **FastAPI** and **Stra
 
 ## 🏗 Architecture Highlights
 
+- **Reverse Proxy (Nginx)**: Acts as the primary gateway, handling SSL termination, Gzip compression, and routing.
 - **Repository Pattern**: Business logic is decoupled from data access through repositories.
 - **Schema-First Design**: Leveraging Strawberry schemas for type-safe GraphQL definitions.
 - **N+1 Prevention**: Explicit use of DataLoaders in `src/core/dataloaders.py` to ensure aggregate queries remain efficient.
@@ -111,14 +113,17 @@ make dev-install
 
 ## 📚 API Documentation
 
-Once the app is running (default port 8000), you can access the following:
+Once the app is running (check `APP_PORT` in your `.env`, default is 8000), all services are accessible via the Nginx Reverse Proxy:
 
 - **GraphQL Playground**: [http://localhost:8000/graphql](http://localhost:8000/graphql)
-- **Health Check**: [http://localhost:8000/health](http://localhost:8000/health)
-- **Adminer (Database GUI)**: [http://localhost:8080](http://localhost:8080)
+- **Health Check (API)**: [http://localhost:8000/health](http://localhost:8000/health)
+- **Adminer (Database GUI)**: [http://localhost:8000/adminer/](http://localhost:8000/adminer/)
   - **System**: MySQL
   - **Server**: `db`
-  - **Username/Password**: Matches your `.env` (e.g., `user`/`password`)
+  - **Username/Password**: Matches your `.env` (e.g., `graphql_user`/`SecurePass123!`)
+- **Nginx Status**: [http://localhost:8000/nginx_health](http://localhost:8000/nginx_health)
+
+> **Note**: Direct access to API (8000) and Adminer (8080) ports are restricted to internal Docker network only for security. Always use the Nginx entry point.
 
 ## 🗄 Database Migrations
 
@@ -156,6 +161,7 @@ make lint
 
 ```text
 ├── alembic/            # Database migration history and environment
+├── nginx/              # Nginx configuration (Reverse Proxy)
 ├── src/
 │   ├── core/           # Shared core components
 │   │   ├── cache.py    # Redis caching service
@@ -170,5 +176,5 @@ make lint
 ├── tests/              # Pytest organization
 ├── Dockerfile          # Multi-stage build process
 ├── docker-compose.yml  # Local service orchestration
-└── Makefile            # Common development task shortcuts
+├── Makefile            # Common development task shortcuts
 ```
