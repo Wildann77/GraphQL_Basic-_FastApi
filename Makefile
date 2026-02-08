@@ -7,8 +7,11 @@ dev-install:
 	pip install -r requirements-dev.txt
 	pre-commit install
 
-up:
+build:
 	docker compose up --build -d
+
+up:
+	docker compose up -d
 
 watch:
 	docker compose up --watch
