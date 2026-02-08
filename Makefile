@@ -23,7 +23,7 @@ down-no-v:
 	docker compose down
 
 logs:
-	docker compose logs -f api
+	docker compose logs -f api nginx
 
 test:
 	pytest tests/ -v --tb=short
