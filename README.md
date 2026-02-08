@@ -115,13 +115,13 @@ make dev-install
 
 Once the app is running (check `APP_PORT` in your `.env`, default is 8000), all services are accessible via the Nginx Reverse Proxy:
 
-- **GraphQL Playground**: [http://localhost:8000/graphql](http://localhost:8000/graphql)
-- **Health Check (API)**: [http://localhost:8000/health](http://localhost:8000/health)
-- **Adminer (Database GUI)**: [http://localhost:8000/adminer/](http://localhost:8000/adminer/)
+- **GraphQL Playground**: [http://localhost/graphql](http://localhost/graphql)
+- **Health Check (API)**: [http://localhost/health](http://localhost/health)
+- **Adminer (Database GUI)**: [http://localhost/adminer/](http://localhost/adminer/)
   - **System**: MySQL
   - **Server**: `db`
   - **Username/Password**: Matches your `.env` (e.g., `graphql_user`/`SecurePass123!`)
-- **Nginx Status**: [http://localhost:8000/nginx_health](http://localhost:8000/nginx_health)
+- **Nginx Status**: [http://localhost/nginx_health](http://localhost/nginx_health)
 
 > **Note**: Direct access to API (8000) and Adminer (8080) ports are restricted to internal Docker network only for security. Always use the Nginx entry point.
 
