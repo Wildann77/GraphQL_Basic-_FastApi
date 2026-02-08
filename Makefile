@@ -8,10 +8,10 @@ dev-install:
 	pre-commit install
 
 build:
-	docker compose up --build -d
+	docker compose up --build
 
 up:
-	docker compose up -d
+	docker compose up
 
 watch:
 	docker compose up --watch
