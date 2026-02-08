@@ -8,7 +8,7 @@ dev-install:
 	pre-commit install
 
 build:
-	docker compose up --build
+	docker compose build
 
 up:
 	docker compose up
